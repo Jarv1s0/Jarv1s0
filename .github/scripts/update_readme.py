@@ -1,4 +1,33 @@
-<p align="center">
+import os
+import json
+import urllib.request
+
+def fetch(url):
+    req = urllib.request.Request(url, headers={'Authorization': f'token {os.environ["GITHUB_TOKEN"]}'})
+    return json.loads(urllib.request.urlopen(req).read())
+
+activity = ''
+for repo in ['Jarv1s0/RouteX', 'Jarv1s0/Proxy_Script']:
+    name = repo.split('/')[1]
+    try:
+        rel = fetch(f'https://api.github.com/repos/{repo}/releases/latest')
+        tag, url = rel['tag_name'], rel['html_url']
+    except:
+        tag, url = 'No release', '#'
+    
+    commit = fetch(f'https://api.github.com/repos/{repo}/commits?per_page=1')[0]
+    msg = commit['commit']['message'].split('\n')[0]
+    curl = commit['html_url']
+    sha = commit['sha'][:7]
+    activity += f'- **{name}** — 🚀 [{tag}]({url}) · 📝 [{msg}]({curl}) (`{sha}`)\n'
+
+try:
+    quote_data = json.loads(urllib.request.urlopen('https://v1.hitokoto.cn/?c=i&c=k').read())
+    quote = quote_data['hitokoto'] + ' — ' + quote_data['from']
+except:
+    quote = '保持好奇，持续学习。'
+
+readme = f"""<p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Hi,%20I'm%20Jarv1s0&fontSize=70&animation=fadeIn" />
 </p>
 
@@ -49,10 +78,15 @@
 ---
 
 ## 🕒 最近动态
+{activity}
 
 ## 💬 每日一句
-> 
+> {quote}
 
 <p align="right">
   <i>最后更新时间：自动更新</i>
 </p>
+"""
+
+with open('README.md', 'w', encoding='utf-8') as f:
+    f.write(readme)
