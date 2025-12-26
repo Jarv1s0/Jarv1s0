@@ -35,14 +35,16 @@ https://github.com/Jarv1s0/Proxy_Script
 
 ## 最近更新（自动生成）
 <!--ACTIVITY_START-->
-正在获取最新信息……（首次运行工作流后这里会被自动替换为 ROUTEx / Proxy_Script 的最新 release 与 commit 摘要）
+- **ROUTEx** — Release: [v1.6.10](https://github.com/Jarv1s0/RouteX/releases/tag/v1.6.10) · Commit: [fix: 修复应用重启后今日流量统计清零的问题](https://github.com/Jarv1s0/RouteX/commit/ff776a387302aef940299e1c99811961606b9fe0) (ff776a3, 2025-12-26 06:02:41)
+- **Proxy_Script** — No release · Commit: [修改dns，使chinaip规则生效](https://github.com/Jarv1s0/Proxy_Script/commit/d33538214ab3d3d8db33de637d44599cfe5034a9) (d335382, 2025-12-26 02:19:52)
 <!--ACTIVITY_END-->
 
 ---
 
 ## 最近发布（自动生成）
 <!--RELEASES_START-->
-正在获取最新 release……（首次运行工作流后这里会被填充）
+- **ROUTEx** — [v1.6.10](https://github.com/Jarv1s0/RouteX/releases/tag/v1.6.10) (2025-12-26 06:11:07)
+- **Proxy_Script** — *No releases*
 <!--RELEASES_END-->
 
 ---
@@ -55,7 +57,8 @@ https://github.com/Jarv1s0/Proxy_Script
 
 ## 每日一句（自动更新）
 <!--QUOTE_START-->
-> 今日一句：保持好奇，持续学习。
+
+> 保持好奇，持续学习。
 <!--QUOTE_END-->
 
 ---
