@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          REPOS=("Jarv1s0/ROUTEx" "Jarv1s0/Proxy_Script")
+          REPOS=("Jarv1s0/RouteX" "Jarv1s0/Proxy_Script")
           ACTIVITY_MD=""
           RELEASES_MD=""
 
