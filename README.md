@@ -58,15 +58,6 @@
 ---
 
 ## 📊 GitHub 统计
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" width="49%" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Jarv1s0&theme=tokyonight&hide_border=true" width="49%" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" width="49%" />
-  <img src="https://github-profile-trophy.vercel.app/?username=Jarv1s0&theme=tokyonight&no-frame=true&column=4&margin-w=15&margin-h=15" width="49%" />
-</p>
 
 <p align="center">
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=Jarv1s0&theme=tokyo-night&hide_border=true&area=true" width="98%" />
@@ -74,13 +65,8 @@
 
 ---
 
-## 🕒 最近动态
-- **RouteX** — 🚀 [v1.6.10](https://github.com/Jarv1s0/RouteX/releases/tag/v1.6.10) · 📝 [fix: 修复应用重启后今日流量统计清零的问题](https://github.com/Jarv1s0/RouteX/commit/ff776a387302aef940299e1c99811961606b9fe0) (`ff776a3`)
-- **Proxy_Script** — 🚀 [No release](#) · 📝 [修改dns，使chinaip规则生效](https://github.com/Jarv1s0/Proxy_Script/commit/d33538214ab3d3d8db33de637d44599cfe5034a9) (`d335382`)
-
-
 ## 💬 每日一句
-> 谁是我们的敌人，谁是我们的朋友，这是革命的首要问题。 — 毛主席语录
+> 我们把世界看错，反说它欺骗了我们。 — 飞鸟集
 
 <p align="right">
   <i>最后更新时间：自动更新</i>
