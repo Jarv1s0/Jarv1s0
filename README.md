@@ -29,12 +29,6 @@
   </tr>
 </table>
 
-## 📊 统计看板
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&count_private=true" width="48%" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight" width="41%" />
-</p>
-
 ## 🕒 最近动态
 <div align="left">
   <ul>
