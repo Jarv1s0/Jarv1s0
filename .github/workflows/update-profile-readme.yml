@@ -57,10 +57,13 @@ jobs:
 
             # Get Latest Commit
             if commit_resp=$(gh_api "https://api.github.com/repos/$owner_repo/commits?per_page=1"); then
-              commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha[0:7] // empty')
+              commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha // empty')
+              if [ -n "$commit_sha" ]; then commit_sha="${commit_sha:0:7}"; fi
               commit_msg=$(echo "$commit_resp" | jq -r '.[0].commit.message' | head -n1 | sed 's/"/\\"/g' || echo "")
               commit_url=$(echo "$commit_resp" | jq -r '.[0].html_url // empty')
-              ACTIVITY_MD="${ACTIVITY_MD}- **${repo_name}** — ${release_info} · 📝 [${commit_msg}](${commit_url}) (\`${commit_sha}\`)\n"
+              sha_disp=""
+              if [ -n "$commit_sha" ]; then sha_disp=" (\`${commit_sha}\`)"; fi
+              ACTIVITY_MD="${ACTIVITY_MD}<li><b>${repo_name}</b> — ${release_info} · 📝 <a href=\"${commit_url}\">${commit_msg}</a>${sha_disp}</li>\n"
             fi
           done
 
@@ -81,15 +84,54 @@ jobs:
           activity=$(echo "${{ steps.build_summaries.outputs.activity }}" | sed 's/\\n/\n/g')
           quote="${{ steps.build_summaries.outputs.quote }}"
 
-          awk -v act="$activity" -v q="$quote" '
-            BEGIN { in_act=0; in_q=0 }
-            // { print; print act; in_act=1; next }
-            // { in_act=0; print; next }
-            // { print; print ""; print "> " q; in_q=1; next }
-            // { in_q=0; print; next }
-            { if(!in_act && !in_q) print }
-          ' README.md > README.new.md
-          mv README.new.md README.md
+          cat > README.md <<EOF
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Hi,%20I'm%20Jarv1s0&fontSize=70&animation=fadeIn" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/github/followers/Jarv1s0?label=Follow&style=for-the-badge&logo=github&color=24292e" />
+  <img src="https://komarev.com/ghpvc/?username=Jarv1s0&color=blue&style=for-the-badge&label=VIEWS" />
+</p>
+
+## 🚀 精选项目
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>RouteX</h3>
+      <p>基于 Electron + TypeScript 的桌面客户端，专注于 UI 重构与构建优化。</p>
+      <a href="https://github.com/Jarv1s0/RouteX">
+        <img src="https://img.shields.io/github/stars/Jarv1s0/RouteX?style=flat-square&logo=github&color=yellow" />
+      </a>
+      <a href="https://github.com/Jarv1s0/RouteX/releases">
+        <img src="https://img.shields.io/github/v/release/Jarv1s0/RouteX?style=flat-square&color=blue" />
+      </a>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Proxy_Script</h3>
+      <p>精选代理客户端配置 (Clash / QX / Loon) 与自动化脚本集合。</p>
+      <a href="https://github.com/Jarv1s0/Proxy_Script">
+        <img src="https://img.shields.io/github/stars/Jarv1s0/Proxy_Script?style=flat-square&logo=github&color=yellow" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+## 📊 统计看板
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&count_private=true" width="48%" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight" width="41%" />
+</p>
+
+## 🕒 最近动态
+<div align="left">
+  <ul>
+${activity}
+  </ul>
+</div>
+
+## 💬 每日一句
+<p align="center"><i>${quote}</i></p>
+EOF
 
       - name: Commit and push
         uses: EndBug/add-and-commit@v9
