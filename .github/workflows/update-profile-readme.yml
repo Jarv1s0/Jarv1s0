@@ -27,51 +27,49 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
+          set -e
 
           REPOS=("Jarv1s0/RouteX" "Jarv1s0/Proxy_Script")
           ACTIVITY_MD=""
 
-          gh_api() {
-            url="$1"
-            http_code=$(curl -sS -w "%{http_code}" -o /tmp/resp.json \
-              -H "Accept: application/vnd.github.v3+json" \
-              -H "Authorization: token ${GITHUB_TOKEN}" \
-              --fail --location --retry 3 --retry-delay 2 \
-              "$url" ) || return 1
-            cat /tmp/resp.json
-          }
-
           for repo in "${REPOS[@]}"; do
-            owner_repo="$repo"
             repo_name="${repo##*/}"
 
             # Get Latest Release Info
-            if release_resp=$(gh_api "https://api.github.com/repos/$owner_repo/releases/latest"); then
-              release_tag=$(echo "$release_resp" | jq -r '.tag_name // empty')
-              release_url=$(echo "$release_resp" | jq -r '.html_url // empty')
+            release_resp=$(curl -sS -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null || echo "{}")
+            
+            release_tag=$(echo "$release_resp" | jq -r '.tag_name // empty' 2>/dev/null || echo "")
+            release_url=$(echo "$release_resp" | jq -r '.html_url // empty' 2>/dev/null || echo "")
+            
+            if [ -n "$release_tag" ] && [ -n "$release_url" ]; then
               release_info="🚀 [${release_tag}](${release_url})"
             else
               release_info="🌱 No release"
             fi
 
             # Get Latest Commit
-            if commit_resp=$(gh_api "https://api.github.com/repos/$owner_repo/commits?per_page=1"); then
-              commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha // empty')
-              if [ -n "$commit_sha" ]; then commit_sha="${commit_sha:0:7}"; fi
-              commit_msg=$(echo "$commit_resp" | jq -r '.[0].commit.message' | head -n1 | sed 's/"/\\"/g' || echo "")
-              commit_url=$(echo "$commit_resp" | jq -r '.[0].html_url // empty')
+            commit_resp=$(curl -sS -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              "https://api.github.com/repos/$repo/commits?per_page=1" 2>/dev/null || echo "[]")
+            
+            commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha // empty' 2>/dev/null | cut -c1-7)
+            commit_msg=$(echo "$commit_resp" | jq -r '.[0].commit.message // empty' 2>/dev/null | head -n1)
+            commit_url=$(echo "$commit_resp" | jq -r '.[0].html_url // empty' 2>/dev/null)
+            
+            if [ -n "$commit_msg" ] && [ -n "$commit_url" ]; then
               sha_disp=""
-              if [ -n "$commit_sha" ]; then sha_disp=" (\`${commit_sha}\`)"; fi
-              ACTIVITY_MD="${ACTIVITY_MD}<li><b>${repo_name}</b> — ${release_info} · 📝 <a href=\"${commit_url}\">${commit_msg}</a>${sha_disp}</li>\n"
+              [ -n "$commit_sha" ] && sha_disp=" (\`${commit_sha}\`)"
+              ACTIVITY_MD="${ACTIVITY_MD}- **${repo_name}** — ${release_info} · 📝 [${commit_msg}](${commit_url})${sha_disp}\n"
             fi
           done
 
           # Daily quote (Hitokoto for better CN support)
-          quote=$(curl -sS --fail "https://v1.hitokoto.cn/?c=i&c=k" | jq -r '.hitokoto + " — " + .from' 2>/dev/null || echo "保持好奇，持续学习。")
+          quote=$(curl -sS "https://v1.hitokoto.cn/?c=i&c=k" 2>/dev/null | jq -r '.hitokoto + " — " + .from' 2>/dev/null || echo "保持好奇，持续学习。")
 
           echo "activity<<EOF" >> "$GITHUB_OUTPUT"
-          printf "%s\n" "${ACTIVITY_MD}" >> "$GITHUB_OUTPUT"
+          printf "%b\n" "${ACTIVITY_MD}" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
           echo "quote<<EOF" >> "$GITHUB_OUTPUT"
@@ -80,20 +78,37 @@ jobs:
 
       - name: Replace README sections
         run: |
-          set -euo pipefail
-          activity=$(echo "${{ steps.build_summaries.outputs.activity }}" | sed 's/\\n/\n/g')
+          set -e
+          activity="${{ steps.build_summaries.outputs.activity }}"
           quote="${{ steps.build_summaries.outputs.quote }}"
 
-          cat > README.md <<EOF
+          cat > README.md <<'READMEEOF'
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Hi,%20I'm%20Jarv1s0&fontSize=70&animation=fadeIn" />
 </p>
+
+> 实用工具集合
+
 <p align="center">
   <img src="https://img.shields.io/github/followers/Jarv1s0?label=Follow&style=for-the-badge&logo=github&color=24292e" />
   <img src="https://komarev.com/ghpvc/?username=Jarv1s0&color=blue&style=for-the-badge&label=VIEWS" />
 </p>
 
+---
+
+## 🛠 技术栈
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Shell_Script-121011?style=for-the-badge&logo=gnu-bash&logoColor=white" />
+</p>
+
+---
+
 ## 🚀 精选项目
+
 <table>
   <tr>
     <td width="50%" valign="top">
@@ -116,16 +131,28 @@ jobs:
   </tr>
 </table>
 
+---
+
 ## 🕒 最近动态
-<div align="left">
-  <ul>
-${activity}
-  </ul>
-</div>
+READMEEOF
+
+          # Append activity
+          printf "%b\n" "$activity" >> README.md
+
+          cat >> README.md <<'READMEEOF'
 
 ## 💬 每日一句
-<p align="center"><i>${quote}</i></p>
-EOF
+> READMEEOF
+
+          # Append quote
+          echo "$quote" >> README.md
+
+          cat >> README.md <<'READMEEOF'
+
+<p align="right">
+  <i>最后更新时间：自动更新</i>
+</p>
+READMEEOF
 
       - name: Commit and push
         uses: EndBug/add-and-commit@v9
