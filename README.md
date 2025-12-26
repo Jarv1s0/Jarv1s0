@@ -60,16 +60,19 @@
 ---
 
 ## 📊 GitHub 统计
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" width="49%" />
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Jarv1s0&theme=tokyonight&hide_border=true" width="49%" />
+</p>
 
-<div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" height="170" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Jarv1s0&theme=tokyonight&hide_border=true" height="170" />
-</div>
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" width="49%" />
+  <img src="https://github-profile-trophy.vercel.app/?username=Jarv1s0&theme=tokyonight&no-frame=true&column=4&margin-w=15&margin-h=15" width="49%" />
+</p>
 
-<div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight&hide_border=true" height="170" />
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=Jarv1s0&theme=tokyo-night&hide_border=true&height=160" />
-</div>
+<p align="center">
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=Jarv1s0&theme=tokyo-night&hide_border=true&area=true" width="98%" />
+</p>
 
 ---
 
@@ -79,7 +82,7 @@
 
 
 ## 💬 每日一句
-> 我想伟大的思想家确实有同样的想法。 — 网络
+> 旧时王谢堂前燕，飞入寻常百姓家。 — 乌衣巷
 
 <p align="right">
   <i>最后更新时间：自动更新</i>
