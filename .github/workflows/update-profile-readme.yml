@@ -2,7 +2,7 @@ name: Update Profile README (repos summary, quote)
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # 每天 UTC 00:00 运行一次
   workflow_dispatch:
 
 permissions:
@@ -93,14 +93,47 @@ jobs:
           done
 
           # Daily quote
-          # use retry and show error
           quote=$(curl -sS --fail --retry 3 --retry-delay 2 "https://api.quotable.io/random" | jq -r '.content + " — " + .author' 2>/dev/null || true)
           if [ -z "$quote" ]; then
             quote="保持好奇，持续学习。"
           fi
 
           # write outputs to GITHUB_OUTPUT
-          printf "%s" "${ACTIVITY_MD}" >> "$GITHUB_OUTPUT"
           echo "activity<<EOF" >> "$GITHUB_OUTPUT"
-          printf "%s\n" "${ACTIVITY_MD](#)
-
+          printf "%s\n" "${ACTIVITY_MD}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo "releases<<EOF" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "${RELEASES_MD}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo "quote<<EOF" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "${quote}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Replace README dynamic sections
+        run: |
+          set -euo pipefail
+          activity=$(echo "${{ steps.build_summaries.outputs.activity }}" | sed 's/\\n/\n/g')
+          releases=$(echo "${{ steps.build_summaries.outputs.releases }}" | sed 's/\\n/\n/g')
+          quote="${{ steps.build_summaries.outputs.quote }}"
+
+          # Prepare temporary file
+          awk -v act="$activity" -v rel="$releases" -v q="$quote" '
+            BEGIN { in_activity=0; in_releases=0; in_quote=0 }
+            /<!--ACTIVITY_START-->/ { print; print act; in_activity=1; next }
+            /<!--ACTIVITY_END-->/ { if(in_activity==1){ in_activity=0 }; print; next }
+            /<!--RELEASES_START-->/ { print; print rel; in_releases=1; next }
+            /<!--RELEASES_END-->/ { if(in_releases==1){ in_releases=0 }; print; next }
+            /<!--QUOTE_START-->/ { print; print ""; print "> " q; in_quote=1; next }
+            /<!--QUOTE_END-->/ { if(in_quote==1){ in_quote=0 }; print; next }
+            { if(in_activity==0 && in_releases==0 && in_quote==0) print }
+          ' README.md > README.new.md || (echo "Failed to generate README.new.md" && exit 1)
+          mv README.new.md README.md
+          git status --porcelain
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "chore: update profile README (activity/releases/quote)"
+          add: README.md
