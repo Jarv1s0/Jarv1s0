@@ -2,25 +2,6 @@ import os
 import json
 import urllib.request
 
-def fetch(url):
-    req = urllib.request.Request(url, headers={'Authorization': f'token {os.environ["GITHUB_TOKEN"]}'})
-    return json.loads(urllib.request.urlopen(req).read())
-
-activity = ''
-for repo in ['Jarv1s0/RouteX', 'Jarv1s0/Proxy_Script']:
-    name = repo.split('/')[1]
-    try:
-        rel = fetch(f'https://api.github.com/repos/{repo}/releases/latest')
-        tag, url = rel['tag_name'], rel['html_url']
-    except:
-        tag, url = 'No release', '#'
-    
-    commit = fetch(f'https://api.github.com/repos/{repo}/commits?per_page=1')[0]
-    msg = commit['commit']['message'].split('\n')[0]
-    curl = commit['html_url']
-    sha = commit['sha'][:7]
-    activity += f'- **{name}** — 🚀 [{tag}]({url}) · 📝 [{msg}]({curl}) (`{sha}`)\n'
-
 try:
     quote_data = json.loads(urllib.request.urlopen('https://v1.hitokoto.cn/?c=i&c=k').read())
     quote = quote_data['hitokoto'] + ' — ' + quote_data['from']
@@ -87,24 +68,12 @@ readme = f"""<p align="center">
 ---
 
 ## 📊 GitHub 统计
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" width="49%" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Jarv1s0&theme=tokyonight&hide_border=true" width="49%" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" width="49%" />
-  <img src="https://github-profile-trophy.vercel.app/?username=Jarv1s0&theme=tokyonight&no-frame=true&column=4&margin-w=15&margin-h=15" width="49%" />
-</p>
 
 <p align="center">
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=Jarv1s0&theme=tokyo-night&hide_border=true&area=true" width="98%" />
 </p>
 
 ---
-
-## 🕒 最近动态
-{activity}
 
 ## 💬 每日一句
 > {quote}
