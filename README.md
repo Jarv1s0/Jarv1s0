@@ -59,7 +59,7 @@
 
 ---
 
-## � 最GitHub 统计
+## 📊 GitHub 统计
 <p align="center">
   <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" width="49%" />
   <img src="https://github-readme-streak-stats.herokuapp.com/?user=Jarv1s0&theme=tokyonight&hide_border=true" width="49%" />
@@ -82,7 +82,7 @@
 
 
 ## 💬 每日一句
-> 那些听不见音乐的人认为那些跳舞的人疯了。 — 笑：论滑稽的意义
+> 我想伟大的思想家确实有同样的想法。 — 网络
 
 <p align="right">
   <i>最后更新时间：自动更新</i>
