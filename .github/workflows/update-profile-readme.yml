@@ -2,7 +2,7 @@ name: Update Profile README (repos summary, quote)
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天 UTC 00:00 运行一次
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
@@ -17,11 +17,15 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Set up jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq ca-certificates
 
       - name: Build activity & release summaries
         id: build_summaries
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
@@ -29,18 +33,39 @@ jobs:
           ACTIVITY_MD=""
           RELEASES_MD=""
 
+          # helper for safe curl to GitHub API with retries and auth
+          gh_api() {
+            url="$1"
+            # use GITHUB_TOKEN to increase rate limit and avoid stricter anon blocking
+            http_code=$(curl -sS -w "%{http_code}" -o /tmp/resp.json \
+              -H "Accept: application/vnd.github.v3+json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              --fail --location --retry 3 --retry-delay 2 \
+              "$url" ) || {
+                echo "curl failed for $url (http_code: $http_code)"
+                cat /tmp/resp.json || true
+                return 1
+              }
+            cat /tmp/resp.json
+            return 0
+          }
+
           for repo in "${REPOS[@]}"; do
             owner_repo="$repo"
             repo_name="${repo##*/}"
 
             # Latest release (may 404 if none)
-            release_resp=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/$owner_repo/releases/latest")
-            release_tag=$(echo "$release_resp" | jq -r '.tag_name // empty')
-            release_html=$(echo "$release_resp" | jq -r '.html_url // empty')
-            release_published=$(echo "$release_resp" | jq -r '.published_at // empty')
-            if [ -n "$release_published" ]; then
-              release_published="$(echo $release_published | sed 's/T/ /; s/Z//')"
+            if release_resp=$(gh_api "https://api.github.com/repos/$owner_repo/releases/latest"); then
+              release_tag=$(echo "$release_resp" | jq -r '.tag_name // empty')
+              release_html=$(echo "$release_resp" | jq -r '.html_url // empty')
+              release_published=$(echo "$release_resp" | jq -r '.published_at // empty')
+              if [ -n "$release_published" ]; then
+                release_published="$(echo $release_published | sed 's/T/ /; s/Z//')"
+              fi
+            else
+              release_tag=""
+              release_html=""
+              release_published=""
             fi
 
             if [ -n "$release_tag" ]; then
@@ -52,49 +77,30 @@ jobs:
             fi
 
             # Latest commit
-            commit_resp=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/$owner_repo/commits?per_page=1")
-            commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha[0:7]')
-            commit_msg=$(echo "$commit_resp" | jq -r '.[0].commit.message' | head -n1 | sed 's/"/\\"/g')
-            commit_url=$(echo "$commit_resp" | jq -r '.[0].html_url')
-            commit_date=$(echo "$commit_resp" | jq -r '.[0].commit.author.date' | sed 's/T/ /; s/Z//')
+            if commit_resp=$(gh_api "https://api.github.com/repos/$owner_repo/commits?per_page=1"); then
+              commit_sha=$(echo "$commit_resp" | jq -r '.[0].sha[0:7] // empty')
+              commit_msg=$(echo "$commit_resp" | jq -r '.[0].commit.message' | head -n1 | sed 's/"/\\"/g' || echo "")
+              commit_url=$(echo "$commit_resp" | jq -r '.[0].html_url // empty')
+              commit_date=$(echo "$commit_resp" | jq -r '.[0].commit.author.date' | sed 's/T/ /; s/Z//')
+            else
+              commit_sha="unknown"
+              commit_msg="(failed to fetch commit)"
+              commit_url="#"
+              commit_date=""
+            fi
 
             ACTIVITY_MD="${ACTIVITY_MD}- **${repo_name}** — ${release_summary} · Commit: [${commit_msg}](${commit_url}) (${commit_sha}, ${commit_date})\n"
           done
 
-          # Daily quote (using quotable API)
-          quote=$(curl -s https://api.quotable.io/random | jq -r '.content + " — " + .author')
+          # Daily quote
+          # use retry and show error
+          quote=$(curl -sS --fail --retry 3 --retry-delay 2 "https://api.quotable.io/random" | jq -r '.content + " — " + .author' 2>/dev/null || true)
           if [ -z "$quote" ]; then
             quote="保持好奇，持续学习。"
           fi
 
-          # Output for next step
-          echo "::set-output name=activity::${ACTIVITY_MD}"
-          echo "::set-output name=releases::${RELEASES_MD}"
-          echo "::set-output name=quote::${quote}"
-
-      - name: Replace README dynamic sections
-        run: |
-          set -euo pipefail
-          activity=$(echo "${{ steps.build_summaries.outputs.activity }}" | sed 's/\\n/\n/g')
-          releases=$(echo "${{ steps.build_summaries.outputs.releases }}" | sed 's/\\n/\n/g')
-          quote="${{ steps.build_summaries.outputs.quote }}"
-
-          # Prepare temporary file
-          awk -v act="$activity" -v rel="$releases" -v q="$quote" '
-            BEGIN { in_activity=0; in_releases=0; in_quote=0 }
-            /<!--ACTIVITY_START-->/ { print; print act; in_activity=1; next }
-            /<!--ACTIVITY_END-->/ { if(in_activity==1){ in_activity=0 }; print; next }
-            /<!--RELEASES_START-->/ { print; print rel; in_releases=1; next }
-            /<!--RELEASES_END-->/ { if(in_releases==1){ in_releases=0 }; print; next }
-            /<!--QUOTE_START-->/ { print; print ""; print "> " q; in_quote=1; next }
-            /<!--QUOTE_END-->/ { if(in_quote==1){ in_quote=0 }; print; next }
-            { if(in_activity==0 && in_releases==0 && in_quote==0) print }
-          ' README.md > README.new.md || (echo "Failed to generate README.new.md" && exit 1)
-          mv README.new.md README.md
-          git status --porcelain
-      - name: Commit and push changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "chore: update profile README (activity/releases/quote)"
-          add: README.md
+          # write outputs to GITHUB_OUTPUT
+          printf "%s" "${ACTIVITY_MD}" >> "$GITHUB_OUTPUT"
+          echo "activity<<EOF" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "${ACTIVITY_MD](#)
+
