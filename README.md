@@ -9,54 +9,6 @@
 
 ---
 
-## 🛠 技术栈
-
-### 语言
-<p align="left">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/Shell_Script-121011?style=for-the-badge&logo=gnu-bash&logoColor=white" />
-</p>
-
-### 框架 & 工具
-<p align="left">
-  <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" />
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white" />
-  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
-  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
-</p>
-
----
-
-## 🚀 精选项目
-
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>RouteX</h3>
-      <p>基于 Electron + TypeScript 的桌面客户端，专注于 UI 重构与构建优化。</p>
-      <a href="https://github.com/Jarv1s0/RouteX">
-        <img src="https://img.shields.io/github/stars/Jarv1s0/RouteX?style=flat-square&logo=github&color=yellow" />
-      </a>
-      <a href="https://github.com/Jarv1s0/RouteX/releases">
-        <img src="https://img.shields.io/github/v/release/Jarv1s0/RouteX?style=flat-square&color=blue" />
-      </a>
-    </td>
-    <td width="50%" valign="top">
-      <h3>Proxy_Script</h3>
-      <p>精选代理客户端配置 (Clash / QX / Loon) 与自动化脚本集合。</p>
-      <a href="https://github.com/Jarv1s0/Proxy_Script">
-        <img src="https://img.shields.io/github/stars/Jarv1s0/Proxy_Script?style=flat-square&logo=github&color=yellow" />
-      </a>
-    </td>
-  </tr>
-</table>
-
----
-
 ## 📊 GitHub 统计
 
 <p align="center">

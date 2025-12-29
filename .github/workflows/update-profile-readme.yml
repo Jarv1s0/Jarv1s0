@@ -1,0 +1,117 @@
+name: Update Profile README
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update README
+        run: |
+          python3 << 'SCRIPT'
+          import os
+          import json
+          import subprocess
+          
+          token = os.environ.get('GITHUB_TOKEN', '')
+          
+          activity = ""
+          for repo in ["Jarv1s0/RouteX", "Jarv1s0/Proxy_Script"]:
+              name = repo.split('/')[-1]
+              
+              rel_cmd = f'curl -sS -H "Authorization: token {token}" https://api.github.com/repos/{repo}/releases/latest'
+              rel_data = json.loads(subprocess.run(rel_cmd, shell=True, capture_output=True, text=True).stdout or '{}')
+              tag = rel_data.get('tag_name', 'No release')
+              rel_url = rel_data.get('html_url', '#')
+              
+              commit_cmd = f'curl -sS -H "Authorization: token {token}" https://api.github.com/repos/{repo}/commits?per_page=1'
+              commit_data = json.loads(subprocess.run(commit_cmd, shell=True, capture_output=True, text=True).stdout or '[]')
+              if commit_data:
+                  msg = commit_data[0].get('commit', {}).get('message', '').split('\n')[0]
+                  url = commit_data[0].get('html_url', '#')
+                  sha = commit_data[0].get('sha', '')[:7]
+                  activity += f"- **{name}** — 🚀 [{tag}]({rel_url}) · 📝 [{msg}]({url}) (`{sha}`)\n"
+          
+          quote_cmd = 'curl -sS https://v1.hitokoto.cn/?c=i&c=k'
+          quote_data = json.loads(subprocess.run(quote_cmd, shell=True, capture_output=True, text=True).stdout or '{}')
+          quote = quote_data.get('hitokoto', '保持好奇，持续学习。') + ' — ' + quote_data.get('from', '')
+          
+          readme = f"""<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=Hi,%20I'm%20Jarv1s0&fontSize=70&animation=fadeIn" />
+</p>
+
+> 实用工具集合
+
+<p align="center">
+  <img src="https://img.shields.io/github/followers/Jarv1s0?label=Follow&style=for-the-badge&logo=github&color=24292e" />
+  <img src="https://komarev.com/ghpvc/?username=Jarv1s0&color=blue&style=for-the-badge&label=VIEWS" />
+</p>
+
+---
+
+## 🛠 技术栈
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" />
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Shell_Script-121011?style=for-the-badge&logo=gnu-bash&logoColor=white" />
+</p>
+
+---
+
+## 🚀 精选项目
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>RouteX</h3>
+      <p>基于 Electron + TypeScript 的桌面客户端，专注于 UI 重构与构建优化。</p>
+      <a href="https://github.com/Jarv1s0/RouteX">
+        <img src="https://img.shields.io/github/stars/Jarv1s0/RouteX?style=flat-square&logo=github&color=yellow" />
+      </a>
+      <a href="https://github.com/Jarv1s0/RouteX/releases">
+        <img src="https://img.shields.io/github/v/release/Jarv1s0/RouteX?style=flat-square&color=blue" />
+      </a>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Proxy_Script</h3>
+      <p>精选代理客户端配置 (Clash / QX / Loon) 与自动化脚本集合。</p>
+      <a href="https://github.com/Jarv1s0/Proxy_Script">
+        <img src="https://img.shields.io/github/stars/Jarv1s0/Proxy_Script?style=flat-square&logo=github&color=yellow" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🕒 最近动态
+{activity}
+
+## 💬 每日一句
+> {quote}
+
+<p align="right">
+  <i>最后更新时间：自动更新</i>
+</p>
+"""
+          
+          with open('README.md', 'w', encoding='utf-8') as f:
+              f.write(readme)
+          SCRIPT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          message: "chore: automated profile update"
+          add: README.md
