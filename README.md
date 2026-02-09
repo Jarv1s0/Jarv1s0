@@ -22,33 +22,6 @@
     <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
 </div>
 
-<br/>
-<br/>
-
-<div align="center">
-  <table border="0" style="border: none;">
-    <tr>
-      <td align="center" style="border: none;">
-        <img src="https://github-readme-stats.vercel.app/api?username=Jarv1s0&show_icons=true&theme=tokyo-night&hide_border=true&count_private=true" alt="Jarv1s0's GitHub stats" />
-      </td>
-      <td align="center" style="border: none;">
-        <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Jarv1s0&layout=compact&theme=tokyo-night&hide_border=true&langs_count=6" alt="Top Languages" />
-      </td>
-    </tr>
-  </table>
-</div>
-
-<br/>
-
----
-
-## 📊 GitHub 统计
-
-<p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=Jarv1s0&theme=tokyo-night&hide_border=true&area=true" width="98%" />
-</p>
-
----
 
 ## 💬 每日一句
 > 保持好奇，持续学习。
